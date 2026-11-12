@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TubeSpace | Domine o Algoritmo do YouTube</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            space: {
+              950: '#07090e',
+              900: '#0c1017',
+              850: '#111723',
+              800: '#171f30',
+              700: '#232f48'
+            },
+            neon: {
+              purple: '#a855f7',
+              blue: '#00d4ff',
+              violet: '#7c3aed',
+              cyan: '#06b6d4'
+            }
+          },
+          boxShadow: {
+            'glow-purple': '0 0 30px -5px rgba(168, 85, 247, 0.4)',
+            'glow-blue': '0 0 30px -5px rgba(0, 212, 255, 0.4)',
+            'glow-card': '0 0 35px -10px rgba(124, 58, 237, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #07090e; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
+    
+    .glass-panel {
+      background: rgba(12, 16, 23, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* SEGURANÇA E PROTEÇÃO CONTRA CÓPIA / DOWNLOAD / IMPRESSÃO */
+    .unselectable {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    @media print {
+      body * {
+        display: none !important;
+      }
+      body:after {
+        content: "Material Protegido por Direitos Autorais TubeSpace. Impressão e download estritamente proibidos.";
+        display: block !important;
+        font-size: 20pt;
+        text-align: center;
+        padding-top: 100px;
+        color: #000;
+      }
+    }
+
+    /* Marca d'água antifraude */
+    .watermark-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0.04;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: space-around;
+      justify-content: space-around;
+      overflow: hidden;
+      transform: rotate(-25deg) scale(1.15);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body class="bg-space-950 text-slate-200 font-sans selection:bg-neon-purple selection:text-white min-h-screen relative overflow-x-hidden unselectable" oncontextmenu="return false;">
+
+  <!-- Luzes de Fundo -->
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-neon-purple/15 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-1/3 right-10 w-[450px] h-[450px] bg-neon-blue/10 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 glass-panel">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Marca -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('landing')">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-neon-purple to-neon-blue flex items-center justify-center shadow-glow-purple text-white font-black text-xl">
+          <i class="fa-brands fa-youtube"></i>
+        </div>
+        <div>
+          <span class="font-display font-black text-2xl tracking-wider text-white">TUBE<span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-blue">SPACE</span></span>
+          <span class="block text-[10px] tracking-widest text-slate-400 uppercase -mt-1 font-semibold">Growth Academy</span>
+        </div>
+      </div>
+
+      <!-- Links Centrais 100% Focados no Cliente -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#planos" onclick="navigate('landing')" class="hover:text-neon-blue transition-colors">Planos & Preços</a>
+        <a href="#conteudo" onclick="navigate('landing')" class="hover:text-neon-purple transition-colors">Conteúdo Oficial</a>
+        <a href="#garantia" onclick="navigate('landing')" class="hover:text-neon-blue transition-colors">Garantia</a>
+      </nav>
+
+      <!-- Ações do Cliente (Login / Ativar Chave / Área de Membros) -->
+      <div id="nav-actions" class="flex items-center gap-3"></div>
+    </div>
+  </header>
+
+  <!-- ================= TOAST NOTIFICATION ================= -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-sm font-medium border"></div>
+
+  <!-- ================= TELAS ================= -->
+  <main id="app-container">
+
+    <!-- 1. VITRINE / VENDAS COM CHECKOUT GREENN -->
+    <section id="view-landing" class="block">
+      
+      <!-- Hero -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20 text-center relative">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-neon-purple/40 bg-neon-purple/10 text-xs font-semibold uppercase tracking-wider text-neon-purple mb-8 shadow-glow-purple">
+          <span class="w-2 h-2 rounded-full bg-neon-purple animate-ping"></span>
+          Biblioteca Oficial TubeSpace 2026
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-display font-black text-white tracking-tight leading-[1.1] max-w-5xl mx-auto">
+          Faça o Algoritmo do YouTube <br class="hidden sm:block">
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-fuchsia-400 to-neon-blue">
+            Trabalhar Para o Seu Canal
+          </span>
+        </h1>
+
+        <p class="mt-8 text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+          Tenha acesso instantâneo aos manuais confidenciais de retenção, engenharia reversa de títulos, ganchos magnéticos e frameworks de escala testados por canais de elite.
+        </p>
+
+        <!-- Stats Rápidos -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-14 pt-10 border-t border-slate-800/80">
+          <div>
+            <p class="text-3xl font-display font-extrabold text-white">+18M</p>
+            <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Views Alavancados</p>
+          </div>
+          <div>
+            <p class="text-3xl font-display font-extrabold text-neon-blue">68.4%</p>
+            <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Retenção Média</p>
+          </div>
+          <div>
+            <p class="text-3xl font-display font-extrabold text-neon-purple">+850</p>
+            <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Canais Treinados</p>
+          </div>
+          <div>
+            <p class="text-3xl font-display font-extrabold text-emerald-400">99.1%</p>
+            <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Satisfação</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vitrine com os 3 Planos -->
+      <section id="planos" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-slate-800/80">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl sm:text-5xl font-display font-extrabold text-white">Escolha Seu Nível de <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-blue">Aceleração</span></h2>
+          <p class="text-slate-400 mt-3 max-w-xl mx-auto text-sm sm:text-base">
+            Pagamento 100% seguro pela Greenn. Após o pagamento você recebe sua Chave de Licença para liberação imediata da Área de Membros.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          
+          <!-- PLANO 1: ESSENCIAL -->
+          <div class="glass-panel rounded-3xl p-8 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs uppercase font-extrabold tracking-widest text-slate-400">Iniciante</span>
+                <i class="fa-solid fa-seedling text-slate-400 text-lg"></i>
+              </div>
+              <h3 class="text-2xl font-display font-bold text-white mt-2">Tubespace Essencial</h3>
+              <p class="text-xs text-slate-400 mt-2 min-h-[36px]">A base sólida para parar de postar no vácuo e ser descoberto pela busca do YouTube.</p>
+
+              <div class="my-6">
+                <span class="text-xs text-slate-400">Acesso Vitalício por apenas</span>
+                <div class="flex items-baseline gap-1 mt-1">
+                  <span class="text-2xl font-bold text-slate-400">R$</span>
+                  <span class="text-5xl font-display font-black text-white">27</span>
+                  <span class="text-slate-400 text-sm">,00</span>
+                </div>
+              </div>
+
+              <div class="space-y-3.5 text-sm border-t border-slate-800/80 pt-6">
+                <p class="text-xs font-bold text-neon-purple uppercase tracking-wider mb-2">4 E-books Inclusos:</p>
+                <div class="flex items-start gap-3 text-slate-300">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Fundamentos do YouTube:</strong> Do Zero ao Pro</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-300">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Guia Prático de Roteiros:</strong> Estrutura de 3 Atos</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-300">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Manual de Capas e Cliques:</strong> A Ciência do CTR</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-300">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Técnicas Básicas de SEO:</strong> Otimização de Busca</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 space-y-3">
+              <a href="https://payfast.greenn.com.br/200315/offer/87BxrH" target="_blank" class="w-full py-4 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white transition-all border border-slate-700 flex items-center justify-center gap-2">
+                <span>Comprar Essencial (R$ 27)</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+              </a>
+              <button onclick="openLicenseModal('essencial')" class="w-full text-center text-xs text-slate-400 hover:text-neon-purple py-1">
+                Já comprou? <strong class="underline">Ativar Chave</strong>
+              </button>
+            </div>
+          </div>
+
+          <!-- PLANO 2: PRO (DESTAQUE) -->
+          <div class="glass-panel rounded-3xl p-8 border-2 border-neon-purple relative flex flex-col justify-between shadow-glow-card transform md:-translate-y-3">
+            <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-neon-purple to-neon-blue px-4 py-1 rounded-full text-[11px] font-black uppercase tracking-wider text-black shadow-lg">
+              Mais Escolhido • Campeão de Retenção
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs uppercase font-extrabold tracking-widest text-neon-purple">Intermediário</span>
+                <i class="fa-solid fa-fire text-neon-purple text-lg"></i>
+              </div>
+              <h3 class="text-2xl font-display font-bold text-white mt-2">Tubespace Pro</h3>
+              <p class="text-xs text-slate-400 mt-2 min-h-[36px]">Domine ganchos hipnóticos nos primeiros 30s, aumente o tempo de exibição e monetize cedo.</p>
+
+              <div class="my-6">
+                <span class="text-xs text-slate-400">Acesso Vitalício por apenas</span>
+                <div class="flex items-baseline gap-1 mt-1">
+                  <span class="text-2xl font-bold text-neon-purple">R$</span>
+                  <span class="text-5xl font-display font-black text-white">47</span>
+                  <span class="text-slate-400 text-sm">,00</span>
+                </div>
+              </div>
+
+              <div class="space-y-3.5 text-sm border-t border-slate-800/80 pt-6">
+                <p class="text-xs font-bold text-neon-blue uppercase tracking-wider mb-2">8 E-books Inclusos (Tudo do Essencial +):</p>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-check text-neon-blue mt-1 text-xs"></i>
+                  <span><strong>Todos os 4 E-books</strong> do Plano Essencial</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Ganchos Magnéticos:</strong> 10s Fatais</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Segredos da Retenção:</strong> Quebras de Padrão</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Guia de Monetização:</strong> Antes dos 1.000 inscritos</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-book text-neon-purple mt-1 text-xs"></i>
+                  <span><strong>Pack de Modelos de Roteiro:</strong> Preencher e Gravar</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 space-y-3">
+              <a href="https://payfast.greenn.com.br/200317/offer/BuWehb" target="_blank" class="w-full py-4 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-neon-purple to-neon-violet hover:opacity-95 text-white transition-all shadow-glow-purple flex items-center justify-center gap-2">
+                <span>Comprar Tubespace Pro (R$ 47)</span>
+                <i class="fa-solid fa-bolt text-xs"></i>
+              </a>
+              <button onclick="openLicenseModal('pro')" class="w-full text-center text-xs text-neon-purple hover:underline py-1">
+                Já comprou? <strong>Ativar Licença Pro</strong>
+              </button>
+            </div>
+          </div>
+
+          <!-- PLANO 3: ULTRA -->
+          <div class="glass-panel rounded-3xl p-8 border border-neon-blue/40 flex flex-col justify-between hover:border-neon-blue transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs uppercase font-extrabold tracking-widest text-neon-blue">Aceleração Máxima</span>
+                <i class="fa-solid fa-crown text-neon-blue text-lg"></i>
+              </div>
+              <h3 class="text-2xl font-display font-bold text-white mt-2">Tubespace Ultra</h3>
+              <p class="text-xs text-slate-400 mt-2 min-h-[36px]">Ecossistema definitivo para furar a bolha, obter parcerias com marcas e gerir o canal como empresa.</p>
+
+              <div class="my-6">
+                <span class="text-xs text-slate-400">Acesso Vitalício por apenas</span>
+                <div class="flex items-baseline gap-1 mt-1">
+                  <span class="text-2xl font-bold text-neon-blue">R$</span>
+                  <span class="text-5xl font-display font-black text-white">97</span>
+                  <span class="text-slate-400 text-sm">,00</span>
+                </div>
+              </div>
+
+              <div class="space-y-3.5 text-sm border-t border-slate-800/80 pt-6">
+                <p class="text-xs font-bold text-neon-blue uppercase tracking-wider mb-2">Coleção Completa (11 Materiais):</p>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-check text-neon-blue mt-1 text-xs"></i>
+                  <span><strong>Todos os 8 E-books</strong> do Essencial e Pro</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-book text-neon-blue mt-1 text-xs"></i>
+                  <span><strong>Crescimento Exponencial:</strong> Sistema de Tiers</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-book text-neon-blue mt-1 text-xs"></i>
+                  <span><strong>Planilhas de Planeamento:</strong> Kanban & Raio-X</span>
+                </div>
+                <div class="flex items-start gap-3 text-slate-200">
+                  <i class="fa-solid fa-book text-neon-blue mt-1 text-xs"></i>
+                  <span><strong>Guia de Parcerias e Marcas:</strong> Media Kit & E-mails</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 space-y-3">
+              <a href="https://payfast.greenn.com.br/200318/offer/6cIJ83" target="_blank" class="w-full py-4 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-600 to-blue-600 hover:opacity-95 text-white transition-all shadow-glow-blue flex items-center justify-center gap-2">
+                <span>Comprar Tubespace Ultra (R$ 97)</span>
+                <i class="fa-solid fa-crown text-xs"></i>
+              </a>
+              <button onclick="openLicenseModal('ultra')" class="w-full text-center text-xs text-neon-blue hover:underline py-1">
+                Já comprou? <strong>Ativar Licença Ultra</strong>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Seção Garantia Incondicional -->
+      <section id="garantia" class="max-w-4xl mx-auto px-4 py-16 text-center">
+        <div class="glass-panel p-8 rounded-3xl border border-slate-800">
+          <i class="fa-solid fa-shield-halved text-3xl text-neon-purple mb-4"></i>
+          <h3 class="text-xl font-display font-bold text-white">Garantia Blindada de Satisfação</h3>
+          <p class="text-sm text-slate-400 mt-2 max-w-xl mx-auto">
+            Acesso vitalício aos materiais com leitura imediata. Segurança garantida no processamento pela Greenn Tecnologia.
+          </p>
+        </div>
+      </section>
+
+      <!-- Rodapé com Gatilho Secreto para o Dono -->
+      <footer class="border-t border-slate-900 bg-space-950 py-12 text-center text-xs text-slate-600">
+        <p>
+          <!-- GATILHO SECRETO 1: Clique duplo no símbolo © abre admin.html -->
+          <span id="secret-admin-trigger" class="cursor-default select-none hover:text-slate-500 transition-colors" title="">©</span> 
+          2026 TubeSpace Growth Academy. Todos os direitos reservados.
+        </p>
+        <p class="mt-1">Pagamentos processados de forma criptografada por Greenn Tecnologia.</p>
+      </footer>
+    </section>
+
+    <!-- 2. ÁREA DE MEMBROS (PROTEGIDA POR LICENÇA E LOGIN) -->
+    <section id="view-members" class="hidden min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      
+      <!-- Topo do Aluno -->
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mb-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Acesso Ativo & Protegido
+          </div>
+          <h2 class="text-3xl font-display font-extrabold text-white">
+            Portal de Estudos: <span id="member-display-name" class="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-blue">Aluno</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Nível de Acesso: <span id="member-display-plan" class="font-bold uppercase tracking-wider text-white px-2 py-0.5 rounded bg-neon-purple/20 border border-neon-purple/40">PLANO</span>
+            <span class="ml-2 text-slate-500">| Leitura online exclusiva sem download</span>
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="navigate('landing')" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+            <i class="fa-solid fa-house mr-1.5"></i> Vitrine
+          </button>
+        </div>
+      </div>
+
+      <!-- Título da Seção -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+          <h3 class="text-xl font-display font-bold text-white">Biblioteca Oficial de E-books</h3>
+          <p class="text-xs text-slate-400">Clique em qualquer material liberado para abrir a leitura protegida na tela.</p>
+        </div>
+      </div>
+
+      <!-- Grid de E-books com Layout Oficial dos PDFs -->
+      <div id="members-books-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL DE AUTENTICAÇÃO ================= -->
+  <div id="modal-auth" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center px-4 hidden">
+    <div class="glass-panel border border-slate-800 rounded-3xl max-w-md w-full p-8 relative shadow-2xl">
+      <button onclick="closeModal('modal-auth')" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex border-b border-slate-800 mb-6">
+        <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-neon-purple text-white transition-all">Entrar</button>
+        <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">Criar Conta</button>
+      </div>
+
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">E-mail Cadastrado</label>
+          <input type="email" id="login-email" required class="w-full bg-space-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-purple" placeholder="seuemail@gmail.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Senha</label>
+          <input type="password" id="login-password" required class="w-full bg-space-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-purple" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-neon-purple to-neon-violet text-white hover:opacity-95 transition-all shadow-glow-purple">
+          Acessar Área do Aluno
+        </button>
+      </form>
+
+      <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Nome Completo</label>
+          <input type="text" id="reg-name" required class="w-full bg-space-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-purple" placeholder="Seu Nome">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">E-mail</label>
+          <input type="email" id="reg-email" required class="w-full bg-space-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-purple" placeholder="seuemail@gmail.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Senha</label>
+          <input type="password" id="reg-password" required class="w-full bg-space-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-purple" placeholder="Mínimo 6 dígitos">
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-600 to-neon-blue text-white hover:opacity-95 transition-all shadow-glow-blue">
+          Concluir Cadastro
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ATIVAÇÃO DE CHAVE ================= -->
+  <div id="modal-license" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center px-4 hidden">
+    <div class="glass-panel border border-neon-purple/40 rounded-3xl max-w-lg w-full p-8 relative shadow-glow-purple">
+      <button onclick="closeModal('modal-license')" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-neon-purple/20 border border-neon-purple/50 flex items-center justify-center text-neon-purple text-2xl mb-3 shadow-glow-purple">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <h3 class="text-2xl font-display font-bold text-white">Ativar Chave de Licença</h3>
+        <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+          Cole a chave enviada no seu e-mail após a confirmação da compra na Greenn para desbloquear seus e-books.
+        </p>
+      </div>
+
+      <form onsubmit="handleActivateKey(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">Chave de Acesso</label>
+          <input type="text" id="license-input" required class="w-full bg-space-900 border border-slate-700 rounded-xl px-4 py-3.5 text-center font-mono text-base font-bold text-neon-blue tracking-widest focus:outline-none focus:border-neon-purple uppercase" placeholder="TS-XXX-XXXXX">
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-xl font-bold text-sm bg-gradient-to-r from-neon-purple via-fuchsia-600 to-neon-blue text-white hover:opacity-95 transition-all shadow-glow-purple">
+          Validar e Liberar Conteúdo
+        </button>
+      </form>
+
+      <p class="text-center text-[11px] text-slate-500 mt-4">
+        Dúvidas sobre sua chave? Verifique a caixa de entrada ou spam do seu e-mail de compra.
+      </p>
+    </div>
+  </div>
+
+  <!-- ================= LEITOR DE E-BOOK DIGITAL SEGURO (ONLINE EMBUTIDO) ================= -->
+  <div id="modal-reader" class="fixed inset-0 z-50 bg-space-950 flex flex-col hidden unselectable" oncontextmenu="return false;">
+    
+    <!-- Topbar do Leitor -->
+    <div class="h-16 border-b border-slate-800 bg-space-900/90 px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white font-bold text-sm shadow">
+          <i id="reader-header-icon" class="fa-solid fa-book"></i>
+        </div>
+        <div>
+          <h4 id="reader-title" class="text-sm font-bold text-white leading-tight">Título</h4>
+          <span id="reader-badge" class="text-[10px] text-slate-400 uppercase font-semibold">MÓDULO OFICIAL • TUBESPACE</span>
+        </div>
+      </div>
+
+      <!-- Controles & Segurança -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-400 text-xs">
+          <i class="fa-solid fa-lock text-[11px] text-emerald-400"></i>
+          <span>Modo Protegido (DRM Ativo)</span>
+        </div>
+        <button onclick="closeReader()" class="w-9 h-9 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Área de Leitura com Watermark Dinâmico Anti-Vazamento -->
+    <div class="flex-1 overflow-y-auto px-4 sm:px-6 py-8 relative bg-slate-950/90" id="reader-scroll-container">
+      
+      <!-- Marca d'Água Dinâmica Transparente no Fundo do Conteúdo -->
+      <div id="watermark-layer" class="watermark-overlay"></div>
+
+      <!-- Folha Digital de Leitura -->
+      <div id="reader-paper" class="max-w-3xl mx-auto space-y-8 bg-[#0d131f] p-6 sm:p-14 rounded-2xl border border-slate-800 text-slate-300 leading-relaxed text-sm sm:text-base relative shadow-2xl">
+        <!-- Páginas e Capítulos Injetados Aqui via JS -->
+      </div>
+    </div>
+
+    <!-- Barra Inferior do Leitor -->
+    <div class="h-12 border-t border-slate-800 bg-space-950 px-6 flex items-center justify-between text-xs text-slate-500">
+      <span class="flex items-center gap-2">
+        <i class="fa-solid fa-shield-halved text-neon-purple text-xs"></i>
+        Documento licenciado exclusivamente para <strong id="reader-licensed-email" class="text-slate-400">usuario@email.com</strong>
+      </span>
+      <span>TubeSpace © 2026</span>
+    </div>
+  </div>
+
+  <!-- ================= BANCO DE CONTEÚDOS DOS E-BOOKS DOS 3 PLANOS ================= -->
+  <script>
+    const EBOOKS_DATABASE = [
+      /* ================= 1. ESSENCIAL (4 MATERIAIS) ================= */
+      {
+        id: 'fundamentos',
+        title: 'Fundamentos do YouTube',
+        subtitle: 'O Guia Definitivo para Criar as Bases do Seu Canal do Zero com Estrutura Profissional.',
+        plan: 'essencial',
+        tag: 'MÓDULO OFICIAL • TUBESPACE',
+        icon: 'fa-play',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO OFICIAL • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">FUNDAMENTOS DO YOUTUBE</h1>
+            <p class="text-sm text-slate-400 mt-2">O Guia Definitivo para Criar as Bases do Seu Canal do Zero com Estrutura Profissional.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Início da Jornada</h2>
+            <p>Bem-vindo ao <strong>Tubespace Essencial</strong>. Se você está lendo isto, você deu o primeiro e mais importante passo: decidiu parar de postar vídeos de forma aleatória para começar a jogar o jogo do algoritmo com estratégia profissional. O YouTube não é uma loteria; é um sistema de causa e efeito focado puramente em comportamento humano.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 1: A Mentalidade do Criador</h3>
+            <p>A maior barreira para o crescimento no YouTube não é o equipamento, nem a falta de dinheiro, nem o algoritmo. É o alinhamento de expectativas. A curva de crescimento na plataforma é <strong>exponencial, não linear</strong>. Isso significa que você pode passar meses ganhando poucos inscritos, até que um único vídeo bem estruturado destrave todo o seu canal.</p>
+            
+            <p class="text-sm font-semibold text-slate-300">Evite os 3 Erros Fatais que destroem canais no primeiro mês:</p>
+            <ol class="list-decimal list-inside space-y-3 text-slate-300 pl-2">
+              <li><strong>Focar na câmera, não na história:</strong> Muitos gastam meses juntando dinheiro para uma câmera e esquecem-se de aprender narrativa. Um vídeo de celular com narrativa magnética viraliza; um vídeo 4K sem roteiro morre ignorado.</li>
+              <li><strong>Postar para você, não para o público:</strong> O YouTube é uma ferramenta de busca. Se o seu vídeo não resolve uma dor, ensina algo ou diverte de forma clara desde a capa, ele será descartado.</li>
+              <li><strong>Desistir na "Zona Fantasma":</strong> Seus primeiros 20 vídeos provavelmente terão poucas visualizações. Isso é normal: o YouTube está calibrando quem é o seu público exato.</li>
+            </ol>
+
+            <div class="p-5 rounded-2xl bg-amber-500/10 border-l-4 border-amber-500 text-slate-200">
+              <p class="font-bold text-amber-400 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Nota de Ouro do Algoritmo</p>
+              <p class="text-xs sm:text-sm mt-1">O algoritmo não tem preferências pessoais e não "odeia" canais pequenos. Ele segue o espectador. Se o seu vídeo faz o espectador clicar (CTR alto) e continuar a assistir (Retenção alta), o YouTube promoverá o seu vídeo independentemente do número de inscritos que você tem.</p>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 2: Escolha e Validação de Nicho</h3>
+            <p>Um nicho lucrativo nasce da interseção entre o que você domina, o que você gosta de fazer e o que as pessoas estão ativamente pesquisando. Abra uma guia anônima e pesquise pelos termos principais do seu nicho. Analise os grandes canais não para copiar, mas para encontrar lacunas (ex: edição lenta, roteiros confusos). É nessa falha que você ataca.</p>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 3: O Guia Prático de Roteiros</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-4">
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-neon-purple block">1. O Gancho (0-10s)</span>
+                <p class="text-xs text-slate-400 mt-1">Confirme imediatamente o que foi prometido na capa do vídeo. Sem enrolação.</p>
+              </div>
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-neon-blue block">2. O Miolo (Conteúdo)</span>
+                <p class="text-xs text-slate-400 mt-1">Entregue valor em blocos dinâmicos. Use quebras de padrão para manter a atenção ativa.</p>
+              </div>
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-emerald-400 block">3. CTA (Ação Final)</span>
+                <p class="text-xs text-slate-400 mt-1">Nunca diga "acabou". Direcione o público para outro vídeo seu, gerando maratona.</p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 'guia-roteiros',
+        title: 'Guia Prático de Roteiros',
+        subtitle: 'Como Escrever Histórias que Prenderem a Atenção do Espectador do Início ao Fim.',
+        plan: 'essencial',
+        tag: 'MÓDULO PRÁTICO • TUBESPACE',
+        icon: 'fa-pen-to-square',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO PRÁTICO • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">GUIA PRÁTICO DE ROTEIROS</h1>
+            <p class="text-sm text-slate-400 mt-2">Como Escrever Histórias que Prenderem a Atenção do Espectador do Início ao Fim.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Segredo dos Vídeos Viciantes</h2>
+            <p>Um bom vídeo no YouTube não surge do improviso absoluto; ele nasce de uma estrutura de roteiro bem planejada. Aprenda a arquitetar suas ideias de forma que o cérebro do espectador seja incapaz de fechar o vídeo antes da conclusão.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 1: A Arquitetura de 3 Atos</h3>
+            <ul class="space-y-3 text-slate-300">
+              <li><strong>1. O Gancho e a Promessa (0 a 15s):</strong> Prove que o vídeo vai entregar exatamente o que a thumbnail prometeu. Sem saudações demoradas.</li>
+              <li><strong>2. O Desenvolvimento Dinâmico (Miolo):</strong> Conteúdo entregue em blocos ágeis, alternando explicações com exemplos práticos visuais.</li>
+              <li><strong>3. O Loop de Encerramento (Final):</strong> Crie uma ponte direta para outro vídeo do seu canal em vez de se despedir.</li>
+            </ul>
+
+            <div class="p-5 rounded-2xl bg-amber-500/10 border-l-4 border-amber-500 text-slate-200">
+              <p class="font-bold text-amber-400">💡 Regra de Ouro da Escrita</p>
+              <p class="text-xs sm:text-sm mt-1">Escreva como você fala. Roteiros engessados e formais soam robóticos e fazem o público perder o interesse rapidamente. Use frases curtas, diretas e com apelo emocional.</p>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 2: Técnicas de Retenção no Roteiro</h3>
+            <p>Introduza <strong>quebras de padrão a cada 45 ou 60 segundos</strong> no seu texto (mudança de entonação, pergunta retórica ou inserção de dado surpreendente).</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-4">
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-white block">1. Problema</span>
+                <p class="text-xs text-slate-400 mt-1">Aponte a dor real logo no início para gerar identificação.</p>
+              </div>
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-white block">2. Agitação</span>
+                <p class="text-xs text-slate-400 mt-1">Mostre o custo de continuar a errar ou o que acontece se não resolver.</p>
+              </div>
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-white block">3. Solução</span>
+                <p class="text-xs text-slate-400 mt-1">Entregue o passo a passo prático de forma clara e objetiva.</p>
+              </div>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 3: Framework de Escrita Rápida</h3>
+            <ul class="space-y-2 text-slate-300">
+              <li>• <strong>Defina uma única ideia central:</strong> Não tente abraçar o mundo.</li>
+              <li>• <strong>Escreva primeiro o miolo e o fim:</strong> Só depois volte para escrever o gancho de abertura.</li>
+              <li>• <strong>Marque as pausas visuais:</strong> Insira anotações como [corte rápido] ou [zoom na tela] para direcionar a gravação.</li>
+            </ul>
+          </div>
+        `
+      },
+      {
+        id: 'capas-cliques',
+        title: 'Manual de Capas e Cliques',
+        subtitle: 'A Ciência Visual do CTR: Como Fazer o Espectador Parar o Scroll e Clicar no Seu Vídeo.',
+        plan: 'essencial',
+        tag: 'MÓDULO VISUAL • TUBESPACE',
+        icon: 'fa-arrow-pointer',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO VISUAL • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">MANUAL DE CAPAS E CLIQUES</h1>
+            <p class="text-sm text-slate-400 mt-2">A Ciência Visual do CTR: Como Fazer o Espectador Parar o Scroll e Clicar.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">A Primeira Impressão</h2>
+            <p>A taxa de cliques (CTR) é o porteiro do seu canal. Você pode ter a edição mais cara do mundo, mas se a capa for ignorada, seu vídeo nunca será assistido. O algoritmo lê dados, mas quem clica é um ser humano impulsivo guiado pelo aspecto visual e pela curiosidade.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 1: O Fator Contraste</h3>
+            <p>A maioria navega no celular com brilho reduzido. A regra de ouro é o <strong>Contraste Extremo</strong>: nunca permita que o elemento principal se misture ao fundo. Use pares de cores complementares (Azul e Laranja, Fundo Escuro com Texto Amarelo Canário) e saturação agressiva.</p>
+
+            <div class="p-5 rounded-2xl bg-amber-500/10 border-l-4 border-amber-500 text-slate-200">
+              <p class="font-bold text-amber-400">⚠️ O Erro da Capa-Resumo</p>
+              <p class="text-xs sm:text-sm mt-1">Iniciantes tentam resumir o vídeo na capa. Profissionais usam a capa apenas para gerar um Pico de Curiosidade. A imagem não deve entregar a resposta, mas sim amplificar o mistério levantado pelo título.</p>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 2: Zonas de Perigo e Composição</h3>
+            <p><strong>Cuidado com o Canto Inferior Direito:</strong> É onde o YouTube insere o bloco preto de duração do vídeo (timestamp). Se colocar texto ou setas ali, a informação será cortada.</p>
+            <p><strong>A Regra dos 3 Elementos:</strong> Limite a capa a: 1. Um rosto expressivo; 2. Um elemento de contexto; 3. Um texto ultra-curto (1 a 3 palavras no máximo).</p>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 3: Anatomia Prática (Antes vs Depois)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+              <div class="p-4 rounded-xl bg-rose-950/20 border border-rose-800/40">
+                <span class="text-xs font-bold text-rose-400 block">❌ EXEMPLO AMADOR</span>
+                <p class="text-xs text-slate-300 mt-2">Foto da pessoa a sorrir num escritório com texto longo: "Aprenda como ganhar dinheiro na internet a partir de hoje". (Ilegível no celular, zero curiosidade).</p>
+              </div>
+              <div class="p-4 rounded-xl bg-emerald-950/20 border border-emerald-800/40">
+                <span class="text-xs font-bold text-emerald-400 block">✅ CAPA MAGNÉTICA</span>
+                <p class="text-xs text-slate-300 mt-2">Rosto em choque apontando para gráfico caindo com texto: "PERDI TUDO?". (Contraste gritante e curiosidade instantânea).</p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+              <p class="text-xs font-bold text-neon-blue">📈 A Métrica que Importa:</p>
+              <p class="text-xs text-slate-400 mt-1">Mire em CTR acima de 6% e retenção acima de 40% no 1º minuto para disparar o tráfego nos Sugeridos.</p>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 'seo-basico',
+        title: 'Técnicas Básicas de SEO',
+        subtitle: 'O Guia Definitivo para Fazer o Algoritmo do YouTube Trabalhar a Seu Favor.',
+        plan: 'essencial',
+        tag: 'MÓDULO ESTRATÉGICO • TUBESPACE',
+        icon: 'fa-magnifying-glass',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO ESTRATÉGICO • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">TÉCNICAS BÁSICAS DE SEO</h1>
+            <p class="text-sm text-slate-400 mt-2">O Guia Definitivo para Fazer o Algoritmo do YouTube Trabalhar a Seu Favor.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Domínio da Pesquisa</h2>
+            <p>SEO (Search Engine Optimization) não é técnica misteriosa: é <strong>Psicologia Humana</strong>. O YouTube é o segundo maior motor de busca do mundo. As pessoas digitam problemas na barra de pesquisa esperando encontrar soluções em formato de vídeo.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 1: A Psicologia do Algoritmo</h3>
+            <p>O algoritmo atua como um casamenteiro. Ele analisa o que o usuário quer e busca na base de dados o vídeo com metadados (Título, Descrição, Tags) mais alinhados com essa intenção.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 2: Masterclass de Títulos (Antes vs Depois)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-4 rounded-xl bg-rose-950/20 border border-rose-800/40">
+                <span class="text-xs font-bold text-rose-400 block">❌ ERRO COMUM (FROUXO)</span>
+                <p class="text-xs text-slate-300 mt-1">"Meu treino de perna de hoje"</p>
+                <p class="text-[11px] text-slate-500 mt-1">Ninguém pesquisa o "seu" treino se você não for famoso.</p>
+              </div>
+              <div class="p-4 rounded-xl bg-emerald-950/20 border border-emerald-800/40">
+                <span class="text-xs font-bold text-emerald-400 block">✅ TÍTULO MAGNÉTICO</span>
+                <p class="text-xs text-slate-200 mt-1 font-bold">"O Treino de Perna de 15 Minutos que Substitui a Academia"</p>
+                <p class="text-[11px] text-emerald-300 mt-1">Palavra-chave + Facilidade + Quebra de Objeção.</p>
+              </div>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 3: Descrições Estratégicas (Template)</h3>
+            <div class="p-4 rounded-xl bg-space-900 border border-slate-800 font-mono text-xs text-slate-300 leading-relaxed">
+              "Neste vídeo, eu vou te mostrar exatamente [REPETIR A PALAVRA-CHAVE DO TÍTULO] de forma simples e direta, mesmo que você [INSERIR OBJEÇÃO/DOR DO PÚBLICO]. Muitas pessoas travam na hora de [TEMA] porque cometem o erro de [ERRO COMUM]... ⏱️ Capítulos do Vídeo: 00:00 - Introdução..."
+            </div>
+            <p class="text-xs text-slate-400">Dica: Os Timestamps são indexados pelo próprio Google fora do YouTube, trazendo visualizações de pesquisas orgânicas da web.</p>
+          </div>
+        `
+      },
+
+      /* ================= 2. PRO (TUDO DO ESSENCIAL + 4 MATERIAIS) ================= */
+      {
+        id: 'ganchos-magneticos',
+        title: 'Ganchos Magnéticos',
+        subtitle: 'A Ciência Psicológica de Prender a Atenção do Espectador nos Primeiros 10 Segundos.',
+        plan: 'pro',
+        tag: 'MÓDULO PRO • TUBESPACE',
+        icon: 'fa-magnet',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO PRO • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">GANCHOS MAGNÉTICOS</h1>
+            <p class="text-sm text-slate-400 mt-2">A Ciência Psicológica de Prender a Atenção nos Primeiros 10 Segundos.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">A Batalha dos Primeiros Segundos</h2>
+            <p>Os primeiros 10 a 15 segundos determinam se a retenção será um sucesso estrondoso ou um fracasso total. Se você começar com "Olá pessoal, bem-vindos ao meu canal...", o espectador fecha o vídeo imediatamente.</p>
+
+            <div class="p-5 rounded-2xl bg-amber-500/10 border-l-4 border-amber-500 text-slate-200">
+              <p class="font-bold text-amber-400">⚠️ A Regra da Confirmação Imediata</p>
+              <p class="text-xs sm:text-sm mt-1">O gancho deve confirmar em frações de segundo que o espectador acertou ao clicar, entregando logo uma promessa forte ou um dado chocante antes de qualquer introdução.</p>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 2: As 4 Fórmulas de Ganchos Verbais</h3>
+            <div class="space-y-3">
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-neon-purple block">1. Gancho da Confrontação (Desafio Direto)</span>
+                <p class="text-xs italic text-slate-300 mt-1">"Tudo o que te ensinaram sobre [Tema] até hoje está completamente errado, e é por isso que você falha."</p>
+              </div>
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-neon-blue block">2. Gancho da Revelação (Curiosidade Extrema)</span>
+                <p class="text-xs italic text-slate-300 mt-1">"Nos próximos 3 minutos, você vai descobrir o truque exato que utilizo para [Resultado] sem gastar um centavo."</p>
+              </div>
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-rose-400 block">3. Gancho da Dor ou Consequência</span>
+                <p class="text-xs italic text-slate-300 mt-1">"Se você continuar a cometer este erro no [Tema], o seu canal vai estagnar para sempre."</p>
+              </div>
+              <div class="p-4 rounded-xl bg-space-900 border border-slate-800">
+                <span class="text-xs font-bold text-emerald-400 block">4. Gancho em Movimento (In Media Res)</span>
+                <p class="text-xs italic text-slate-300 mt-1">Comece exatamente no momento mais tenso da gravação: "Neste exato segundo, eu estava prestes a perder tudo, até que percebi isto..."</p>
+              </div>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-8">Checklist do Gancho Perfeito</h3>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✅ Começa sem saudações mornas ou cumprimentos?</li>
+              <li>✅ Confirma de forma cristalina a promessa feita na capa?</li>
+              <li>✅ Existe elemento visual com zoom ou corte nos primeiros 3 segundos?</li>
+              <li>✅ Dura no máximo de 10 a 15 segundos antes de transitar para o conteúdo?</li>
+            </ul>
+          </div>
+        `
+      },
+      {
+        id: 'segredos-retencao',
+        title: 'Segredos da Retenção',
+        subtitle: 'A Engenharia Visual e Psicológica para Manter o Público Preso Até o Último Segundo.',
+        plan: 'pro',
+        tag: 'MÓDULO PRO • TUBESPACE',
+        icon: 'fa-stopwatch',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO PRO • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">SEGREDOS DA RETENÇÃO</h1>
+            <p class="text-sm text-slate-400 mt-2">A Engenharia Visual e Psicológica para Manter o Público Preso.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Motor do Algoritmo</h2>
+            <p>Existe apenas uma métrica mestra no YouTube: <strong>Tempo de Sessão</strong>. O YouTube quer que as pessoas continuem consumindo vídeos para ver anúncios. Vídeos que retêm o público ganham distribuição exponencial.</p>
+
+            <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800">
+              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">📈 O Número Mágico</span>
+              <p class="text-sm text-slate-200 mt-1 font-semibold">A meta é atingir 60% ou mais de retenção na marca dos primeiros 30 segundos, e terminar o vídeo mantendo de 40% a 50% das pessoas.</p>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 2: Quebras de Padrão (Pattern Interrupts)</h3>
+            <p>A atenção humana decai a cada 8 a 15 segundos de vídeo estático. Para mantê-la acesa:</p>
+            <ul class="space-y-3 text-slate-300">
+              <li>• <strong>Cortes Secos (Jump Cuts):</strong> Elimine respiros e hesitações.</li>
+              <li>• <strong>Efeito B-Roll Constante:</strong> Mostre na tela imagens ou gravações de apoio sempre que citar algo.</li>
+              <li>• <strong>Zoom Progressivo (Punch-In):</strong> Aproxime 10% a 15% a câmera em momentos enfáticos.</li>
+              <li>• <strong>Sound Design:</strong> Use efeitos sutis ("Whoosh", "Pop") para reancorar o cérebro.</li>
+            </ul>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 3: O Efeito Zeigarnik (Loops Abertos)</h3>
+            <p>O cérebro humano odeia tarefas incompletas. Abra um mistério no início e só entregue no desfecho: <em>"Vou te mostrar 3 passos, mas o 3º passo é o que 99% das pessoas erra e joga dinheiro fora..."</em>.</p>
+          </div>
+        `
+      },
+      {
+        id: 'guia-monetizacao',
+        title: 'Guia de Monetização',
+        subtitle: 'Estratégias Avançadas para Faturar no YouTube Muito Antes dos 1.000 Inscritos.',
+        plan: 'pro',
+        tag: 'MÓDULO PRO • TUBESPACE',
+        icon: 'fa-sack-dollar',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO PRO • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">GUIA DE MONETIZAÇÃO</h1>
+            <p class="text-sm text-slate-400 mt-2">Estratégias Avançadas para Faturar no YouTube Muito Antes dos 1.000 Inscritos.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Mito do AdSense</h2>
+            <p>Esperar por 1.000 inscritos e 4.000 horas para começar a lucrar é o maior erro de quem começa. O AdSense deve ser encarado como sobremesa, nunca como prato principal. O YouTube é um motor de busca: as pessoas já assistem com intenção de resolver dores reais.</p>
+
+            <div class="p-5 rounded-2xl bg-amber-500/10 border-l-4 border-amber-500 text-slate-200">
+              <p class="font-bold text-amber-400">⚠️ A Regra do Vídeo Zero</p>
+              <p class="text-xs sm:text-sm mt-1">O seu primeiro vídeo já deve ser monetizado com links de afiliados ou produtos próprios. Nunca publique um vídeo sem uma Chamada para Ação (CTA) lucrativa.</p>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 2: O Poder do CTA Invisível</h3>
+            <p>Apresente o produto como a ferramenta natural de resolução, e não como comercial chato:</p>
+            <div class="p-4 rounded-xl bg-space-900 border border-slate-800 text-xs text-slate-300">
+              <em>"Eu só consegui organizar minhas finanças rápido assim porque usei a planilha automática. Se quiserem testar, deixei o link exato no primeiro comentário fixado."</em>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-6">📌 O Imobiliário Mais Caro</h3>
+            <p>No celular, a maioria não abre a descrição longa, mas rola para ver os comentários. <strong>O Comentário Fixado no topo</strong> é a área com a maior taxa de conversão do YouTube.</p>
+          </div>
+        `
+      },
+      {
+        id: 'pack-roteiros',
+        title: 'Pack de Modelos de Roteiro',
+        subtitle: 'Estruturas Prontas e Validadas para Apenas Preencher as Lacunas e Gravar.',
+        plan: 'pro',
+        tag: 'MÓDULO PRO • TUBESPACE',
+        icon: 'fa-file-lines',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-purple">MÓDULO PRO • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">PACK DE MODELOS DE ROTEIRO</h1>
+            <p class="text-sm text-slate-400 mt-2">Estruturas Prontas e Validadas para Preencher as Lacunas e Gravar.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Fim do "Branco" na Mente</h2>
+            <p>Com estes modelos prontos, basta preencher os campos com o tema do seu canal e começar a gravação.</p>
+
+            <div class="p-5 rounded-2xl bg-space-900 border border-slate-800 space-y-3">
+              <span class="text-xs font-bold text-neon-blue uppercase">Estrutura 1: O Tutorial Implacável</span>
+              <p class="text-xs font-mono text-slate-300"><strong>GANCHO (0-15s):</strong> "Se você ainda comete o erro de [ERRO DO NICHO], você está perdendo [TEMPO/DINHEIRO] todos os dias. Neste vídeo, eu vou te mostrar os [NÚMERO] passos exatos para [RESULTADO], mesmo que você [OBJEÇÃO]."</p>
+              <p class="text-xs font-mono text-slate-300"><strong>MIOLO:</strong> Passo 1: [AÇÃO 1] -> Passo 2: [TÉCNICA 2] -> Passo 3: [AÇÃO FINAL].</p>
+              <p class="text-xs font-mono text-slate-300"><strong>CTA INVISÍVEL:</strong> "Uso a ferramenta [NOME] para automatizar isso. O link oficial está no comentário fixado."</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-space-900 border border-slate-800 space-y-3 mt-4">
+              <span class="text-xs font-bold text-neon-purple uppercase">Estrutura 2: O Listicle / Top X Magnético</span>
+              <p class="text-xs font-mono text-slate-300"><strong>GANCHO MISTERIOSO:</strong> "Existem [NÚMERO] segredos que ninguém te conta sobre [TEMA]. E o número [ÚLTIMO NÚMERO] é o motivo pelo qual você nunca consegue [RESULTADO]."</p>
+              <p class="text-xs font-mono text-slate-300"><strong>CONTAGEM:</strong> Item 1 -> Item 2 -> O Grande Final (Recompensa de alto valor).</p>
+            </div>
+          </div>
+        `
+      },
+
+      /* ================= 3. ULTRA (TUDO DO PRO + 3 MATERIAIS) ================= */
+      {
+        id: 'crescimento-exponencial',
+        title: 'Crescimento Exponencial',
+        subtitle: 'Estratégias Avançadas para Dominar o Algoritmo, Furar a Bolha e Escalar o Seu Canal.',
+        plan: 'ultra',
+        tag: 'MÓDULO ULTRA • TUBESPACE',
+        icon: 'fa-rocket',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-blue">MÓDULO ULTRA • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">CRESCIMENTO EXPONENCIAL</h1>
+            <p class="text-sm text-slate-400 mt-2">Estratégias Avançadas para Furar a Bolha e Escalar o Canal.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">A Matemática do Sucesso</h2>
+            <p>O YouTube não cresce de forma linear (10 views hoje, 20 amanhã). Ele cresce por <strong>explosões</strong>. Canais ficam meses com poucas visualizações diárias até que um vídeo fura a bolha e arrasta todo o catálogo junto.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 1: O Sistema de Tiers (Camadas de Risco)</h3>
+            <ul class="space-y-3 text-slate-300">
+              <li>• <strong>Tier 1 (Semente):</strong> Exibido para inscritos fiéis e notificações. Se CTR e Retenção forem altos, sobe de camada.</li>
+              <li>• <strong>Tier 2 (Público Frequente):</strong> Exibido para quem já viu vídeos seus mas não se inscreveu.</li>
+              <li>• <strong>Tier 3 (Público Frio):</strong> O Santo Graal da viralização. Recomendado para milhões de pessoas desconhecidas. Exige CTR > 6% e Retenção > 45% nas primeiras 24 horas.</li>
+            </ul>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 2: Engenharia de Virais (Modelação)</h3>
+            <p>Encontre os <strong>"Outliers"</strong>: vídeos com 3 a 5 vezes mais visualizações que a média normal daquele canal. Desconstrua o motivo pelo qual aquele tema explodiu e aplique a técnica de <em>Melhoria 10x</em> (áudio mais nítido, capa mais contrastada, roteiro mais ágil).</p>
+
+            <h3 class="text-lg font-bold text-white mt-8">Capítulo 4: O Efeito Binge-Watching</h3>
+            <p>Elimine despedidas formais ("Obrigado por assistir, deixe o like"). Em vez disso, faça a transição direta:</p>
+            <div class="p-4 rounded-xl bg-space-900 border border-slate-800 text-xs italic text-slate-300">
+              "Saber editar é inútil se ninguém clicar no seu vídeo. Por isso, clique agora neste vídeo aqui na tela onde eu mostro o segredo da taxa de cliques milionária."
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 'planilhas-planeamento',
+        title: 'Planilhas de Planeamento',
+        subtitle: 'Frameworks de Gestão Visual e Tática para Produção de Vídeos em Alta Escala.',
+        plan: 'ultra',
+        tag: 'MÓDULO ULTRA • TUBESPACE',
+        icon: 'fa-chart-column',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-blue">MÓDULO ULTRA • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">PLANILHAS DE PLANEAMENTO</h1>
+            <p class="text-sm text-slate-400 mt-2">Frameworks de Gestão Visual e Tática para Produção em Escala.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Fim do Amadorismo</h2>
+            <p>Quem depende de inspiração diária está condenado ao fracasso. Profissionais operam com esteiras de produção em lote e metas quantitativas.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Fase 2: A Esteira de Produção (Kanban TubeSpace)</h3>
+            <div class="overflow-x-auto my-4">
+              <table class="w-full text-left text-xs text-slate-300 border border-slate-800 rounded-xl">
+                <thead class="bg-space-900 text-slate-400 uppercase font-mono">
+                  <tr>
+                    <th class="p-3">Título do Vídeo</th>
+                    <th class="p-3">Roteiro</th>
+                    <th class="p-3">Capa</th>
+                    <th class="p-3">Gravação</th>
+                    <th class="p-3">Edição</th>
+                    <th class="p-3">Publicado</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                  <tr>
+                    <td class="p-3 font-semibold text-white">O Erro Fatal do AdSense</td>
+                    <td class="p-3 text-emerald-400">✅</td>
+                    <td class="p-3 text-emerald-400">✅</td>
+                    <td class="p-3 text-emerald-400">✅</td>
+                    <td class="p-3 text-rose-400">❌</td>
+                    <td class="p-3 text-rose-400">❌</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mt-8">Fase 3: O Raio-X Pós-Publicação (Métricas de 24h)</h3>
+            <div class="space-y-3">
+              <div class="p-3 rounded-xl bg-space-900 border border-slate-800 flex justify-between items-center text-xs">
+                <span>Taxa de Cliques (CTR)</span>
+                <span class="font-bold text-neon-blue">Meta: > 6,0% (Se falhar, troque Capa e Título)</span>
+              </div>
+              <div class="p-3 rounded-xl bg-space-900 border border-slate-800 flex justify-between items-center text-xs">
+                <span>Retenção em 30 Segundos</span>
+                <span class="font-bold text-neon-purple">Meta: > 60% (Se falhar, ajuste o Gancho Inicial)</span>
+              </div>
+              <div class="p-3 rounded-xl bg-space-900 border border-slate-800 flex justify-between items-center text-xs">
+                <span>Retenção Final Média</span>
+                <span class="font-bold text-emerald-400">Meta: > 40% (Se falhar, use mais cortes secos)</span>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: 'guia-parcerias',
+        title: 'Guia de Parcerias e Marcas',
+        subtitle: 'Como Negociar Patrocínios Rentáveis Mesmo Com Um Canal Pequeno.',
+        plan: 'ultra',
+        tag: 'MÓDULO ULTRA • TUBESPACE',
+        icon: 'fa-handshake',
+        iconBg: 'bg-red-600',
+        contentHtml: `
+          <div class="text-center pb-8 border-b border-slate-800">
+            <span class="text-xs font-mono uppercase tracking-widest text-neon-blue">MÓDULO ULTRA • TUBESPACE</span>
+            <h1 class="text-3xl sm:text-4xl font-display font-black text-white mt-2">GUIA DE PARCERIAS E MARCAS</h1>
+            <p class="text-sm text-slate-400 mt-2">Como Negociar Patrocínios Rentáveis Mesmo Com Um Canal Pequeno.</p>
+          </div>
+
+          <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-red-500 uppercase tracking-wide">O Mito dos Milhões de Inscritos</h2>
+            <p>Marcas hoje priorizam microinfluenciadores (5k a 50k inscritos) altamente nichados em vez de pagar fortunas para canais gigantes sem conversão. Uma comunidade engajada vale muito mais do que números inflados.</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 1: O Seu Media Kit</h3>
+            <p>O Media Kit é o seu currículo comercial em PDF de 2 páginas. Fale sobre o <strong>poder de compra e perfil da sua audiência</strong>, taxa de retenção média e dados do YouTube Studio (idade predominante e visualizações únicas).</p>
+
+            <h3 class="text-lg font-bold text-white mt-6">Capítulo 3: O Template de Abordagem (Cold Email)</h3>
+            <div class="p-5 rounded-2xl bg-space-900 border border-slate-800 font-mono text-xs text-slate-300 space-y-2 leading-relaxed">
+              <p><strong>Assunto:</strong> Parceria de Conteúdo: [Seu Canal] + [Nome da Marca]</p>
+              <p>Olá [Nome], tudo bem?</p>
+              <p>Acompanho o trabalho da [Nome da Marca] e utilizo a vossa solução de [Produto] no meu dia a dia.</p>
+              <p>Sou criador do canal [Nome do Canal], focado em [Nicho]. A minha audiência bate exatamente com o perfil do vosso cliente ideal (pessoas entre [Idade] que buscam [Problema]).</p>
+              <p>Geramos mais de [Número] mil visualizações ativas mensais. Segue em anexo nosso Media Kit com formatos de integração. Têm disponibilidade para uma breve chamada de 10 minutos na próxima semana?</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-amber-500/10 border-l-4 border-amber-500 text-slate-200">
+              <p class="font-bold text-amber-400">💡 Dica de Ouro de Precificação</p>
+              <p class="text-xs sm:text-sm mt-1">Negocie um modelo Híbrido: taxa fixa para cobrir custos de produção (R$ 300 a R$ 500) + comissão por venda (CPA) gerada pelo seu link exclusivo.</p>
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    /* ================= LOCALSTORAGE & GERENCIAMENTO DE ESTADO ================= */
+    const Storage = {
+      getKeys: () => JSON.parse(localStorage.getItem('tubespace_licenses') || '[]'),
+      saveKeys: (k) => localStorage.setItem('tubespace_licenses', JSON.stringify(k)),
+      getUsers: () => JSON.parse(localStorage.getItem('tubespace_users') || '[]'),
+      saveUsers: (u) => localStorage.setItem('tubespace_users', JSON.stringify(u)),
+      getSession: () => JSON.parse(localStorage.getItem('tubespace_current_session') || 'null'),
+      setSession: (s) => localStorage.setItem('tubespace_current_session', JSON.stringify(s))
+    };
+
+    /* INICIALIZAÇÃO DE CHAVES DEMO SE VAZIO */
+    (function seedDefaultKeys() {
+      let keys = Storage.getKeys();
+      if (keys.length === 0) {
+        keys = [
+          { key: 'TS-ESS-2026', tier: 'essencial', status: 'available', buyer: 'Chave Teste Essencial' },
+          { key: 'TS-PRO-2026', tier: 'pro', status: 'available', buyer: 'Chave Teste Pro' },
+          { key: 'TS-ULTRA-2026', tier: 'ultra', status: 'available', buyer: 'Chave Teste Ultra' }
+        ];
+        Storage.saveKeys(keys);
+      }
+    })();
+
+    /* ROTEAMENTO DE TELAS */
+    function navigate(view) {
+      const vLanding = document.getElementById('view-landing');
+      const vMembers = document.getElementById('view-members');
+
+      if (view === 'members') {
+        const user = Storage.getSession();
+        if (!user) {
+          openModal('modal-auth');
+          showToast('Faça login primeiro para acessar a Área de Membros.', 'error');
+          return;
+        }
+        if (!user.plan) {
+          openModal('modal-license');
+          showToast('Insira sua Chave de Licença para desbloquear.', 'info');
+          return;
+        }
+        vLanding.classList.add('hidden');
+        vMembers.classList.remove('hidden');
+        renderMembersArea();
+      } else {
+        vLanding.classList.remove('hidden');
+        vMembers.classList.add('hidden');
+      }
+      updateNavbar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateNavbar() {
+      const container = document.getElementById('nav-actions');
+      const user = Storage.getSession();
+
+      if (!user) {
+        container.innerHTML = `
+          <button onclick="openModal('modal-auth'); switchAuthTab('login');" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-2">
+            Entrar
+          </button>
+          <button onclick="openModal('modal-license')" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-neon-blue border border-neon-blue/40 transition-all flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-key text-[11px]"></i>
+            <span>Ativar Chave</span>
+          </button>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-semibold text-white hidden sm:inline">${user.name.split(' ')[0]}</span>
+            ${user.plan 
+              ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-neon-purple/20 text-neon-purple border border-neon-purple/40">${user.plan}</span>`
+              : `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-400">Sem Licença</span>`
+            }
+            ${user.plan 
+              ? `<button onclick="navigate('members')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-neon-purple/20 text-neon-purple border border-neon-purple/40 hover:bg-neon-purple/30">Membros</button>` 
+              : `<button onclick="openModal('modal-license')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-neon-blue text-black hover:opacity-90 animate-pulse">Ativar Chave</button>`
+            }
+            <button onclick="handleLogout()" title="Sair da Conta" class="text-slate-400 hover:text-rose-400 p-2 text-xs">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    /* MODAIS */
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function openLicenseModal(tierHint) {
+      openModal('modal-license');
+      if (tierHint) showToast(`Insira a chave do seu plano ${tierHint.toUpperCase()}`, 'info');
+    }
+
+    function switchAuthTab(tab) {
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegister = document.getElementById('tab-register');
+      const fLogin = document.getElementById('form-login');
+      const fRegister = document.getElementById('form-register');
+
+      if (tab === 'login') {
+        tabLogin.className = "flex-1 pb-3 text-sm font-semibold border-b-2 border-neon-purple text-white transition-all";
+        tabRegister.className = "flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all";
+        fLogin.classList.remove('hidden');
+        fRegister.classList.add('hidden');
+      } else {
+        tabRegister.className = "flex-1 pb-3 text-sm font-semibold border-b-2 border-neon-blue text-white transition-all";
+        tabLogin.className = "flex-1 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all";
+        fRegister.classList.remove('hidden');
+        fLogin.classList.add('hidden');
+      }
+    }
+
+    /* AUTENTICAÇÃO */
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const password = document.getElementById('reg-password').value;
+
+      const users = Storage.getUsers();
+      if (users.some(u => u.email === email)) {
+        showToast('E-mail já registrado. Faça login!', 'error');
+        switchAuthTab('login');
+        return;
+      }
+
+      const newUser = { name, email, password, plan: null };
+      users.push(newUser);
+      Storage.saveUsers(users);
+      Storage.setSession(newUser);
+
+      closeModal('modal-auth');
+      updateNavbar();
+      showToast('Conta criada com sucesso! Insira sua licença.', 'success');
+      openModal('modal-license');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+
+      const users = Storage.getUsers();
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (!user) {
+        showToast('Credenciais incorretas!', 'error');
+        return;
+      }
+
+      Storage.setSession(user);
+      closeModal('modal-auth');
+      updateNavbar();
+      showToast(`Bem-vindo, ${user.name.split(' ')[0]}!`, 'success');
+
+      if (user.plan) navigate('members');
+      else openModal('modal-license');
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('tubespace_current_session');
+      updateNavbar();
+      navigate('landing');
+      showToast('Sessão encerrada.', 'info');
+    }
+
+    /* ATIVAÇÃO DE CHAVE */
+    function handleActivateKey(e) {
+      e.preventDefault();
+      const typedKey = document.getElementById('license-input').value.trim().toUpperCase();
+
+      let user = Storage.getSession();
+      if (!user) {
+        closeModal('modal-license');
+        openModal('modal-auth');
+        showToast('Cadastre-se ou entre na sua conta para ativar.', 'info');
+        return;
+      }
+
+      const keys = Storage.getKeys();
+      const keyIndex = keys.findIndex(k => k.key.toUpperCase() === typedKey);
+
+      if (keyIndex === -1) {
+        showToast('Chave inexistente ou inválida!', 'error');
+        return;
+      }
+
+      const license = keys[keyIndex];
+      if (license.status === 'used') {
+        showToast('Esta chave já foi utilizada anteriormente!', 'error');
+        return;
+      }
+
+      // Marcar chave como utilizada
+      license.status = 'used';
+      license.usedBy = user.email;
+      license.activatedAt = new Date().toLocaleDateString('pt-BR');
+      keys[keyIndex] = license;
+      Storage.saveKeys(keys);
+
+      // Atualizar o plano do usuário
+      user.plan = license.tier;
+      user.activeKey = license.key;
+      Storage.setSession(user);
+
+      const users = Storage.getUsers();
+      const uIdx = users.findIndex(u => u.email === user.email);
+      if (uIdx !== -1) {
+        users[uIdx].plan = license.tier;
+        users[uIdx].activeKey = license.key;
+        Storage.saveUsers(users);
+      }
+
+      closeModal('modal-license');
+      updateNavbar();
+      showToast(`Plano ${license.tier.toUpperCase()} ativado com sucesso!`, 'success');
+      navigate('members');
+    }
+
+    /* ================= RENDERIZADOR DA ÁREA DE MEMBROS ================= */
+    function renderMembersArea() {
+      const user = Storage.getSession();
+      if (!user || !user.plan) return;
+
+      document.getElementById('member-display-name').innerText = user.name;
+      document.getElementById('member-display-plan').innerText = `PLANO ${user.plan.toUpperCase()}`;
+
+      // Configuração dos Níveis de Acesso
+      const tierHierarchy = { 'essencial': 1, 'pro': 2, 'ultra': 3 };
+      const userLevel = tierHierarchy[user.plan] || 0;
+
+      const container = document.getElementById('members-books-container');
+      container.innerHTML = '';
+
+      EBOOKS_DATABASE.forEach(book => {
+        const bookLevel = tierHierarchy[book.plan] || 1;
+        const isUnlocked = userLevel >= bookLevel;
+
+        const card = document.createElement('div');
+        card.className = `glass-panel rounded-3xl p-6 border transition-all duration-300 flex flex-col justify-between relative overflow-hidden ${
+          isUnlocked 
+            ? 'border-slate-800 hover:border-neon-purple/60 hover:shadow-glow-purple' 
+            : 'border-slate-900 opacity-60 bg-space-950/90'
+        }`;
+
+        card.innerHTML = `
+          <div>
+            <!-- Capa do Livro em Miniatura (Design dos PDFs) -->
+            <div class="h-44 w-full bg-[#0a0f18] rounded-2xl border border-slate-800 flex flex-col items-center justify-center p-4 text-center relative mb-5 shadow-inner">
+              <div class="w-10 h-10 rounded-lg ${book.iconBg} text-white flex items-center justify-center text-lg mb-2 shadow-md">
+                <i class="fa-solid ${book.icon}"></i>
+              </div>
+              <span class="font-display font-extrabold text-sm text-white uppercase tracking-wider line-clamp-1">${book.title}</span>
+              <span class="text-[9px] text-slate-500 font-mono tracking-widest uppercase mt-1">${book.tag}</span>
+
+              <!-- Status Badge -->
+              <span class="absolute top-3 right-3 text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                isUnlocked ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+              }">
+                ${isUnlocked ? '<i class="fa-solid fa-lock-open mr-1"></i> Liberado' : '<i class="fa-solid fa-lock mr-1"></i> Requer ' + book.plan.toUpperCase()}
+              </span>
+            </div>
+
+            <h4 class="text-base font-display font-bold text-white">${book.title}</h4>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${book.subtitle}</p>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800/80">
+            ${isUnlocked 
+              ? `<button onclick="openReader('${book.id}')" class="w-full py-3 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-neon-purple to-neon-violet hover:opacity-95 text-white transition-all shadow-glow-purple flex items-center justify-center gap-2">
+                   <i class="fa-solid fa-book-open"></i>
+                   <span>Ler Agora na Tela</span>
+                 </button>`
+              : `<button onclick="openLicenseModal('${book.plan}')" class="w-full py-3 px-4 rounded-xl text-xs font-bold bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2">
+                   <i class="fa-solid fa-arrow-up text-amber-400"></i>
+                   <span>Fazer Upgrade p/ ${book.plan.toUpperCase()}</span>
+                 </button>`
+            }
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* ================= SISTEMA DE LEITURA DRM (ONLINE EMBUTIDO) ================= */
+    function openReader(bookId) {
+      const book = EBOOKS_DATABASE.find(b => b.id === bookId);
+      if (!book) return;
+
+      const user = Storage.getSession();
+      if (!user) return;
+
+      // Configurar Cabeçalho e Folha de Leitura
+      document.getElementById('reader-title').innerText = book.title;
+      document.getElementById('reader-badge').innerText = book.tag;
+      document.getElementById('reader-header-icon').className = `fa-solid ${book.icon}`;
+      document.getElementById('reader-paper').innerHTML = book.contentHtml;
+      document.getElementById('reader-licensed-email').innerText = user.email;
+
+      // Gerar Marca d'Água Transparente com Dados do Aluno (Inibidor de Screenshots)
+      const watermarkLayer = document.getElementById('watermark-layer');
+      watermarkLayer.innerHTML = '';
+      const stampText = `${user.email} • ID: ${user.activeKey || 'LIC-AUTH'} • `;
+      for (let i = 0; i < 28; i++) {
+        const span = document.createElement('span');
+        span.className = 'm-4';
+        span.innerText = stampText;
+        watermarkLayer.appendChild(span);
+      }
+
+      document.getElementById('modal-reader').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      document.getElementById('reader-scroll-container').scrollTop = 0;
+    }
+
+    function closeReader() {
+      document.getElementById('modal-reader').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    /* ================= PROTEÇÕES DE SEGURANÇA E ACESSOS SECRETOS ================= */
+    window.addEventListener('keydown', (e) => {
+      // 1. ATALHO SECRETO DO DONO: Ctrl + Shift + A abre admin.html
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        window.open('admin.html', '_blank');
+        return;
+      }
+
+      // Fechar leitor com ESC
+      if (e.key === 'Escape') closeReader();
+
+      // Bloquear Ctrl+S (Salvar), Ctrl+P (Imprimir), Ctrl+U (Ver Fonte), F12 (DevTools)
+      if (
+        (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u')) ||
+        e.key === 'F12'
+      ) {
+        e.preventDefault();
+        showToast('Ação bloqueada: Material protegido contra cópia e download.', 'error');
+        return false;
+      }
+    });
+
+    /* GATILHO SECRETO 2: Clique duplo no © do Rodapé */
+    document.addEventListener('DOMContentLoaded', () => {
+      const trigger = document.getElementById('secret-admin-trigger');
+      if (trigger) {
+        trigger.addEventListener('dblclick', () => {
+          window.open('admin.html', '_blank');
+        });
+      }
+    });
+
+    /* TOAST DE FEEDBACK */
+    function showToast(msg, type = 'info') {
+      const toast = document.getElementById('toast');
+      const styles = {
+        success: 'bg-emerald-950/90 border-emerald-500 text-emerald-200',
+        error: 'bg-rose-950/90 border-rose-500 text-rose-200',
+        info: 'bg-slate-900/95 border-neon-purple text-white shadow-glow-purple'
+      };
+      toast.className = `fixed bottom-6 right-6 z-50 transition-all duration-300 flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl text-xs font-semibold border ${styles[type] || styles.info}`;
+      toast.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${msg}</span>`;
+      toast.classList.remove('translate-y-32', 'opacity-0');
+      setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 3500);
+    }
+
+    // Inicialização da Página
+    window.addEventListener('DOMContentLoaded', () => {
+      updateNavbar();
+      navigate('landing');
+    });
+  </script>
+</body>
+</html>
